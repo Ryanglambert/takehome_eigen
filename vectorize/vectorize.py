@@ -2,6 +2,7 @@ import csv
 import numpy as np
 import os
 import re
+import sys
 
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -96,22 +97,20 @@ def _get_col_mask_with_word(word: np.array,
     return doc_mask
 
 
-def marshal_records(records):
-    marshalled = []
-    for record in records:
-        word, docs, sents = record
-        docs = ", ".join(docs)
-        sents = "\n".join(sents)
-        marshalled_record = word, docs, sents
-        marshalled.append(marshalled_record)
-    return marshalled
-
-
 def create_hashtag_records(docs: list, 
                            doc_names: list,
                            max_words: int=10,
                            min_freq: int=3,
                            min_doc_freq: int=2):
+    """takes a list of docs and doc names
+    and turns this into parsed results that map
+    the words matched according to `max_words` `min_freq` and `min_doc_freq`
+
+    The output is a table that maps each word to which documents it appeared in and which sentences it appears in.
+
+    This is not a memory friendly function.  More thought would be necessary to accomplish this.
+    """
+
     if not len(doc_names) == len(docs):
         raise ValueError("docs and doc_names should be the same length")
     # read_docs
@@ -153,7 +152,47 @@ def create_hashtag_records(docs: list,
             (word, doc_names_relevant, sents_relevant)
         )
     return records
+
+
+def _replace_nextlines(string):
+    return string.replace('\n', '')
+
+
+def marshal_records(records):
+    "prepares records for csv writing"
+    marshalled = []
+    for record in records:
+        word, docs, sents = record
+        sents = [_replace_nextlines(i)
+                 for i in sents]
+        docs = " ".join(docs)
+        sents = "<NEW_SENTENCE>".join(sents)
+        marshalled_record = word, docs, sents
+        marshalled.append(marshalled_record)
+    return marshalled
+
+
+def write_records(records, path):
+    with open(path, 'w', newline='') as csv_file:
+        writer = csv.writer(csv_file)
+        for record in records:
+            print(record)
+            writer.writerow(record)
+
+
+def process_document_director(path, dest):
+    docs, doc_names = _read_documents(path)
+    records = create_hashtag_records(docs, doc_names, min_freq=10, max_words=20)
+    records = marshal_records(records)
+    write_records(records, dest)
         
         
+if __name__ == '__main__':
+    # A cleaner way would be to use parse_args. But for something like passing arguments let's just do it later given the time constraints
+    document_directory_path = sys.argv[1]
+    destination_path = sys.argv[2]
+    process_document_director(
+        document_directory_path,
+        destination_path)
 
 # create_hashtag_table('test docs', "hashtag_table.csv")
