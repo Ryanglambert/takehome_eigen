@@ -4,8 +4,7 @@ import pytest
 
 from Vectorize import vectorize
 
-CUR_DIR = os.path.dirname(os.path.realpath(__file__))
-TEST_DOC_DIR = os.path.join(CUR_DIR, 'Vectorize', 'test docs')
+TEST_DOC_DIR = 'test docs'
 
 
 def test_read_document():
