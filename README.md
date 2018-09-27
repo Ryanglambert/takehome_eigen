@@ -15,6 +15,6 @@
 
 you can tail the file or open in up in the jupyter notebook provided to mess around
 
-`jupyter notebook Opening\ the\ CSV\ with\ pandas`
+`jupyter notebook Opening\ the\ CSV\ with\ pandas.ipynb`
 
 cheers
