@@ -1,0 +1,7 @@
+vectorize/__init__.py
+vectorize/test_everything.py
+vectorize/vectorize.py
+vectorize.egg-info/PKG-INFO
+vectorize.egg-info/SOURCES.txt
+vectorize.egg-info/dependency_links.txt
+vectorize.egg-info/top_level.txt

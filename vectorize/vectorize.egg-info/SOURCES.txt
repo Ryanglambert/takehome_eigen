@@ -1,0 +1,4 @@
+vectorize.egg-info/PKG-INFO
+vectorize.egg-info/SOURCES.txt
+vectorize.egg-info/dependency_links.txt
+vectorize.egg-info/top_level.txt

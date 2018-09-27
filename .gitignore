@@ -1,0 +1,6 @@
+.eigen_env/
+*.swp
+*.so
+*.pkl
+*.ipynb
+*.csv
