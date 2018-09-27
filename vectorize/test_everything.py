@@ -1,12 +1,18 @@
 import numpy as np
+import os
 import pytest
 
-import vectorize
+
+from Vectorize import vectorize
+
+
+CUR_DIR = os.path.dirname(os.path.realpath(__file__))
+TEST_DOC_PATH = os.path.join(CUR_DIR, 'test docs')
 
 
 def test_read_document():
     expected = 'Let me begin'
-    output = vectorize._read_document('test docs/doc1.txt')[:12]
+    output = vectorize._read_document(os.path.join(TEST_DOC_PATH, 'doc1.txt'))[:12]
     assert expected == output
 
 
@@ -55,6 +61,3 @@ def test_vectorize():
     assert list(tsent_matrix.toarray()[0]) == [1, 0, 0, 2]
     assert list(tsent_matrix.toarray()[1]) == [2, 0, 1, 0]
     assert list(tsent_matrix.toarray()[2]) == [0, 2, 0, 1]
-
-
-def 
