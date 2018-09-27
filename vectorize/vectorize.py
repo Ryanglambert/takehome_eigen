@@ -79,11 +79,31 @@ def _top_n_words_by_frequency(words, word_freq, n, reverse=True):
     return words[indices].copy(), word_freq[indices].copy()
 
 
+def _get_col_mask_with_word(word: np.array,
+                            matrix: np.array,
+                            lookup: np.array):
+    "Get's a mask for the col in `matrix` that corresponds to the location of the word in lookup"
+    word_mask = lookup == word
+    word_column = matrix.T[word_mask].T
+    doc_mask = (word_column > 0)
+
+    # this is a bit hacky but I'm under some time constraints
+    # should be fixed by properly dealing with csr vs ndarray
+    if not isinstance(doc_mask, np.ndarray):
+        doc_mask = doc_mask.toarray()
+
+    doc_mask = doc_mask.reshape(-1,)
+    return doc_mask
+
+
+
 def create_hashtag_records(docs: list, 
                            doc_names: list,
                            max_words: int=10,
                            min_freq: int=3,
                            min_doc_freq: int=2):
+    if not len(doc_names) == len(docs):
+        raise ValueError("docs and doc_names should be the same length")
     # read_docs
     sents = _flatten([SENT.split(doc) for doc in docs])
     doc_names, sents = np.array(doc_names), np.array(sents)
@@ -105,9 +125,25 @@ def create_hashtag_records(docs: list,
 
     # Sort and retrieve the top 'n' where n -> `max_words` 
     # np.argpartition avoids sorting the entire list (good for time!)
-    import ipdb; ipdb.set_trace()
     top_n_words, top_n_freqs = _top_n_words_by_frequency(filtered_vocab, filtered_frequencies, n=max_words)
 
-
+    records = []
+    for word, freq in zip(top_n_words, top_n_freqs):
+        mask_doc_with_word = _get_col_mask_with_word(
+            word,
+            td_matrix,
+            vocab)
+        doc_names_relevant = doc_names[mask_doc_with_word]
+        mask_sents_relevant = _get_col_mask_with_word(
+            word,
+            tsent_matrix,
+            vocab)
+        sents_relevant = sents[mask_sents_relevant]
+        records.append(
+            (word, doc_names_relevant, sents_relevant)
+        )
+    return records
+        
+        
 
 # create_hashtag_table('test docs', "hashtag_table.csv")

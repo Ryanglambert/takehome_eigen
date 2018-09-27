@@ -92,6 +92,26 @@ def test_bug_word_frequencies():
     assert list(highest_word_freqs) == [10, 9, 8, 3, 2]
 
 
+def test_get_idx_with_word():
+    name_lookup = np.array([
+        'black', 'red', 'blue', 'orange', 'pink'
+    ])
+    matrix = np.array([
+        [0, 0, 2, 2, 1],
+        [1, 1, 3, 1, 4],
+        [0, 1, 1, 3, 2],
+        [1, 0, 2, 3, 3]
+    ])
+    word = "black"
+    output = vectorize._get_col_mask_with_word(word,
+                                               matrix,
+                                               name_lookup)
+    expected = np.array([False, True, False, True])
+    assert output.shape == expected.shape
+    assert list(output) == list(expected)
+
+
+
 def test_create_hashtag_records():
     docs = [
         'pink orange orange red. pink.',
@@ -99,7 +119,7 @@ def test_create_hashtag_records():
         'orange blue red pink. pink pink. red.',
         'orange black red red. red pink pink. pink orange.'
     ]
-    doc_names = ['doc1', 'doc2', 'doc3']
+    doc_names = ['doc1', 'doc2', 'doc3', 'doc4']
     output = vectorize.create_hashtag_records(
         docs, doc_names, max_words=10, min_freq=1, min_doc_freq=1)
 
