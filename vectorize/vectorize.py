@@ -96,6 +96,16 @@ def _get_col_mask_with_word(word: np.array,
     return doc_mask
 
 
+def marshal_records(records):
+    marshalled = []
+    for record in records:
+        word, docs, sents = record
+        docs = ", ".join(docs)
+        sents = "\n".join(sents)
+        marshalled_record = word, docs, sents
+        marshalled.append(marshalled_record)
+    return marshalled
+
 
 def create_hashtag_records(docs: list, 
                            doc_names: list,

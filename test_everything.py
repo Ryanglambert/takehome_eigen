@@ -150,4 +150,61 @@ def test_create_hashtag_records():
             "pink orange"
         ])
     ]
-    
+
+
+def test_marshal_records():
+    unmarshalled = [
+        ('red', ["doc1", "doc2", "doc3"], [
+            "pink orange orange red.",
+            "red black blue red red orange.",
+            "pink red."
+            "red.",
+            "orange black red red.",
+            "red pink pink.",
+        ]),
+        ('pink', ["doc1", "doc2", "doc3"], [
+            "pink orange orange red.",
+            "pink.",
+            "pink red.",
+            "orange blue red pink.",
+            "pink pink.",
+            "red pink pink.",
+            "pink orange."
+        ]),
+        ('orange', ["doc1", "doc2", "doc3"], [
+            "pink orange orange red.",
+            "red black blue red red orange.",
+            "orange orange.",
+            "orange blue red pink.",
+            "orange black red red.",
+            "pink orange"
+        ])
+    ]
+    output = vectorize.marshal_records(unmarshalled)
+    expected = [
+        ('red', "doc1, doc2, doc3", (
+            "pink orange orange red.\n"
+            "red black blue red red orange.\n"
+            "pink red.\n"
+            "red.\n"
+            "orange black red red.\n"
+            "red pink pink.\n"
+        )),
+        ('pink', "doc1, doc2, doc3", (
+            "pink orange orange red.\n"
+            "pink.\n"
+            "pink red.\n"
+            "orange blue red pink.\n"
+            "pink pink.\n"
+            "red pink pink.\n"
+            "pink orange.\n"
+        )),
+        ('orange', "doc1, doc2, doc3", (
+            "pink orange orange red.\n"
+            "red black blue red red orange.\n"
+            "orange orange.\n"
+            "orange blue red pink.\n"
+            "orange black red red.\n"
+            "pink orange\n"
+        ))
+    ]
