@@ -58,3 +58,76 @@ def test_vectorize():
     assert list(tsent_matrix.toarray()[0]) == [1, 0, 0, 2]
     assert list(tsent_matrix.toarray()[1]) == [2, 0, 1, 0]
     assert list(tsent_matrix.toarray()[2]) == [0, 2, 0, 1]
+
+
+# @pytest.mark.parametrize(
+#     "n, expected", [
+#         (0, )
+#     ]
+def test_top_n_words_by_frequency():
+    words = np.array(['black', 'blue', 'orange', 'pink', 'red'])
+    word_freqs = np.array([2, 1, 20, 10, 3])
+    highest_words, highest_word_freqs = vectorize._top_n_words_by_frequency(
+        words, word_freqs, 3
+    )
+    assert isinstance(highest_words, np.ndarray)
+    assert list(highest_words) == ['orange', 'pink', 'red']
+    assert isinstance(highest_word_freqs, np.ndarray)
+    assert list(highest_word_freqs) == [20, 10, 3]
+
+
+def test_bug_word_frequencies():
+    "this bug took me 4 man hours to find sorry bout hte delay"
+    # E       assert [3, 10, 8, 9, 2] == [10, 9, 8, 2, 3]
+    # E         At index 0 diff: 3 != 10
+    # E         Full diff:
+    # E         - [3, 10, 8, 9, 2]
+    # E         + [10, 9, 8, 2, 3]
+    words = np.array(['black', 'blue', 'orange', 'pink', 'red'])
+    word_freqs = np.array([ 3,  2,  8,  9, 10])
+    highest_words, highest_word_freqs = vectorize._top_n_words_by_frequency(
+        words, word_freqs, 5
+    )
+    assert list(highest_words) == ['red', 'pink', 'orange', 'black', 'blue']
+    assert list(highest_word_freqs) == [10, 9, 8, 3, 2]
+
+
+def test_create_hashtag_records():
+    docs = [
+        'pink orange orange red. pink.',
+        'red black blue red red orange. pink red. orange orange.',
+        'orange blue red pink. pink pink. red.',
+        'orange black red red. red pink pink. pink orange.'
+    ]
+    doc_names = ['doc1', 'doc2', 'doc3']
+    output = vectorize.create_hashtag_records(
+        docs, doc_names, max_words=10, min_freq=1, min_doc_freq=1)
+
+    expected = [
+        ('red', ["doc1", "doc2", "doc3"], [
+            "pink orange orange red.",
+            "red black blue red red orange.",
+            "pink red."
+            "red.",
+            "orange black red red.",
+            "red pink pink.",
+        ]),
+        ('pink', ["doc1", "doc2", "doc3"], [
+            "pink orange orange red.",
+            "pink.",
+            "pink red.",
+            "orange blue red pink.",
+            "pink pink.",
+            "red pink pink.",
+            "pink orange."
+        ]),
+        ('orange', ["doc1", "doc2", "doc3"], [
+            "pink orange orange red.",
+            "red black blue red red orange.",
+            "orange orange.",
+            "orange blue red pink.",
+            "orange black red red.",
+            "pink orange"
+        ])
+    ]
+    

@@ -68,13 +68,23 @@ def _get_word_frequencies(td_matrix: np.array):
     ).reshape(-1,)
 
 
-def create_hashtag_table(doc_dir: str, 
-                         dest_path: str,
-                         max_words: int=10,
-                         min_freq: int=3,
-                         min_doc_freq: int=2):
+def _top_n_words_by_frequency(words, word_freq, n, reverse=True):
+    "return top n occuring words and frequencies"
+
+    sign = 1. if not reverse else -1.
+    n = word_freq.shape[0] if n > word_freq.shape[0] else n
+    
+    indices = np.argpartition(
+        sign * word_freq, np.arange(n))[:n]
+    return words[indices].copy(), word_freq[indices].copy()
+
+
+def create_hashtag_records(docs: list, 
+                           doc_names: list,
+                           max_words: int=10,
+                           min_freq: int=3,
+                           min_doc_freq: int=2):
     # read_docs
-    docs, doc_names = _read_documents(doc_dir)
     sents = _flatten([SENT.split(doc) for doc in docs])
     doc_names, sents = np.array(doc_names), np.array(sents)
 
@@ -88,11 +98,15 @@ def create_hashtag_table(doc_dir: str,
     # filter down to words of interest based on min_freq, max_words, and min_doc_freq
     mask_min_doc_freq = word_doc_occurences >= min_doc_freq
     mask_min_word_freq = word_frequencies >= min_freq
+
+
     filtered_vocab = vocab[mask_min_doc_freq & mask_min_word_freq].copy()
     filtered_frequencies = word_frequencies[mask_min_doc_freq & mask_min_word_freq].copy()
 
     # Sort and retrieve the top 'n' where n -> `max_words` 
     # np.argpartition avoids sorting the entire list (good for time!)
+    import ipdb; ipdb.set_trace()
+    top_n_words, top_n_freqs = _top_n_words_by_frequency(filtered_vocab, filtered_frequencies, n=max_words)
 
 
 
